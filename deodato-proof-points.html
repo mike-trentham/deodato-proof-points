@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deodato — Proof Points Menu</title>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --dark-cypress: #002e21;
+    --deep-green:   #001a13;
+    --lava-burst:   #ff6544;
+    --ivory-veil:   #f8f7f6;
+    --alpine:       #c1d9cd;
+    --sagewood:     #b2cec6;
+    --line:         rgba(193,217,205,0.18);
+    --card:         #ffffff;
+    --card-line:    rgba(0,46,33,0.08);
+    --muted:        #5a7a6e;
+    --text:         #102d23;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { font-family: 'Nunito Sans', -apple-system, sans-serif; background: var(--ivory-veil); color: var(--text); -webkit-font-smoothing: antialiased; }
+
+  header {
+    background: linear-gradient(165deg, var(--dark-cypress) 0%, var(--deep-green) 100%);
+    color: var(--ivory-veil);
+    padding: 36px 48px 28px;
+  }
+  .logo { font-family: 'Merriweather', serif; font-weight: 900; font-size: 22px; letter-spacing: 5px; text-transform: uppercase; }
+  .sub { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--sagewood); margin-top: 4px; }
+  .h1 { font-family: 'Merriweather', serif; font-size: 34px; font-weight: 700; margin-top: 22px; max-width: 760px; line-height: 1.2; }
+  .lede { font-size: 15px; color: var(--alpine); margin-top: 12px; max-width: 720px; line-height: 1.55; }
+
+  .controls {
+    background: var(--dark-cypress);
+    padding: 18px 48px;
+    border-bottom: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; gap: 18px; align-items: center;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .control-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .control-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--sagewood); margin-right: 4px; }
+  .icp-tab, .filter-chip, .kind-toggle, .anon-toggle {
+    font-family: 'Nunito Sans', sans-serif; font-size: 12px; font-weight: 700;
+    padding: 7px 14px; border-radius: 999px; cursor: pointer; border: 1px solid var(--line);
+    background: rgba(193,217,205,0.06); color: var(--alpine);
+    transition: background 0.12s ease, color 0.12s ease, border 0.12s ease;
+  }
+  .icp-tab.active { background: var(--lava-burst); color: #fff; border-color: var(--lava-burst); }
+  .filter-chip.active { background: var(--alpine); color: var(--dark-cypress); border-color: var(--alpine); }
+  .kind-toggle.active, .anon-toggle.active { background: var(--alpine); color: var(--dark-cypress); border-color: var(--alpine); }
+  .search {
+    background: rgba(193,217,205,0.08); border: 1px solid var(--line); color: var(--ivory-veil);
+    padding: 8px 14px; border-radius: 999px; font-family: 'Nunito Sans', sans-serif; font-size: 13px;
+    width: 240px; outline: none;
+  }
+  .search::placeholder { color: var(--sagewood); }
+
+  main { max-width: 1200px; margin: 0 auto; padding: 36px 48px 80px; }
+
+  .icp-section { margin-bottom: 44px; }
+  .icp-h {
+    font-family: 'Merriweather', serif; font-size: 18px; font-weight: 700;
+    color: var(--dark-cypress); margin-bottom: 16px; padding-bottom: 10px;
+    border-bottom: 2px solid var(--lava-burst); display: inline-block; padding-right: 12px;
+  }
+
+  .snippet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 16px; }
+
+  .snippet {
+    background: var(--card); border: 1px solid var(--card-line); border-radius: 14px;
+    padding: 18px 20px 16px; display: flex; flex-direction: column; gap: 10px;
+    box-shadow: 0 2px 8px rgba(0,46,33,0.04);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .snippet:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,46,33,0.07); }
+  .snippet[hidden] { display: none; }
+
+  .snippet-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .kind-pill {
+    font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 6px;
+  }
+  .kind-one-liner { background: rgba(255,101,68,0.12); color: var(--lava-burst); }
+  .kind-blurb     { background: rgba(0,46,33,0.08); color: var(--dark-cypress); }
+  .chips { display: flex; flex-wrap: wrap; gap: 4px; margin-left: auto; }
+  .chip {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.4px;
+    padding: 3px 8px; border-radius: 6px;
+    background: rgba(0,46,33,0.05); color: var(--muted);
+  }
+  .chip-client { background: rgba(255,101,68,0.08); color: var(--lava-burst); font-weight: 700; }
+
+  .snippet-text { font-size: 14px; line-height: 1.6; color: var(--text); }
+
+  .snippet-actions { display: flex; gap: 6px; margin-top: auto; padding-top: 6px; border-top: 1px dashed var(--card-line); }
+  .copy-btn, .anon-btn {
+    font-family: 'Nunito Sans', sans-serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer;
+    padding: 7px 12px; border-radius: 8px; border: none;
+  }
+  .copy-btn { background: var(--dark-cypress); color: var(--ivory-veil); }
+  .copy-btn:hover { background: var(--lava-burst); }
+  .copy-btn.copied { background: #1a8a5e; }
+  .anon-btn { background: rgba(0,46,33,0.06); color: var(--muted); }
+  .anon-btn.active { background: var(--alpine); color: var(--dark-cypress); }
+
+  .empty-state {
+    text-align: center; padding: 60px 20px; color: var(--muted);
+    font-size: 14px;
+  }
+
+  footer {
+    text-align: center; padding: 24px; color: var(--muted); font-size: 11px;
+    border-top: 1px solid var(--card-line); margin-top: 40px;
+  }
+
+  @media (max-width: 720px) {
+    header, .controls, main { padding-left: 22px; padding-right: 22px; }
+    .h1 { font-size: 26px; }
+    .snippet-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">DEODATO</div>
+  <div class="sub">Proof Points Menu — Internal</div>
+  <div class="h1">A reference of facts, wins, and lines that work in any conversation.</div>
+  <p class="lede">Filter by ICP, by service, by length. Click to copy. Toggle to an anonymized variant when you need to share something safer. Built off our brag sheets, the BWG event materials, and the 2026 capabilities deck.</p>
+</header>
+
+<div class="controls">
+  <div class="control-group">
+    <span class="control-label">ICP</span>
+    <button class="icp-tab" data-icp="all">Cross-ICP / Agency</button><button class="icp-tab" data-icp="icp1">ICP 1: VC-Backed Early Stage</button><button class="icp-tab" data-icp="icp2">ICP 2: Legacy &amp; Omnichannel</button><button class="icp-tab" data-icp="icp3">ICP 3: Travel, Events &amp; Hospitality</button><button class="icp-tab" data-icp="icp4">ICP 4: D2C Growth Brand</button>
+  </div>
+  <div class="control-group">
+    <span class="control-label">Service</span>
+    <button class="filter-chip" data-svc="paid">Paid Media</button><button class="filter-chip" data-svc="seo">SEO / AEO</button><button class="filter-chip" data-svc="retail">Retail Media</button><button class="filter-chip" data-svc="creative">Creative</button><button class="filter-chip" data-svc="web">Web / CRO</button><button class="filter-chip" data-svc="data">Data</button><button class="filter-chip" data-svc="attribution">Attribution</button><button class="filter-chip" data-svc="consulting">Consulting</button>
+  </div>
+  <div class="control-group">
+    <span class="control-label">Length</span>
+    <button class="kind-toggle active" data-kind="all">All</button>
+    <button class="kind-toggle" data-kind="one-liner">One-liners</button>
+    <button class="kind-toggle" data-kind="blurb">Blurbs</button>
+  </div>
+  <div class="control-group" style="margin-left:auto;">
+    <input class="search" type="text" placeholder="Search text..." id="search">
+  </div>
+</div>
+
+<main id="content">
+  
+      <section class="icp-section" data-icp="all">
+        <h2 class="icp-h">Cross-ICP / Agency</h2>
+        <div class="snippet-grid">
+          
+        <div class="snippet" data-id="ag-01" data-kind="one-liner" data-services="paid" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            
+            <div class="chips"><span class="chip svc-paid">Paid Media</span></div>
+          </div>
+          <div class="snippet-text named">We&#x27;ve managed $300M+ in combined annual media spend across e-commerce and consumer brands.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="ag-02" data-kind="one-liner" data-services="paid consulting" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            
+            <div class="chips"><span class="chip svc-paid">Paid Media</span><span class="chip svc-consulting">Consulting</span></div>
+          </div>
+          <div class="snippet-text named">Over the last three years, we&#x27;ve taken three companies public, led two successful acquisitions, and helped clients raise $200M+ in startup funding after scaling with us.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="ag-04" data-kind="one-liner" data-services="all" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            
+            <div class="chips"><span class="chip svc-all">All Services</span></div>
+          </div>
+          <div class="snippet-text named">35 full-time team. NYC-based. Channel-agnostic by design — paid, SEO/AEO, retail media, creative, affiliate, email, and growth consulting under one roof.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="ag-05" data-kind="blurb" data-services="all" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            
+            <div class="chips"><span class="chip svc-all">All Services</span></div>
+          </div>
+          <div class="snippet-text named">We&#x27;re a boutique NYC growth agency built for e-commerce and consumer brands. We act as both an agency and a consultancy: we run paid, SEO/AEO, retail media, creative, affiliate, and email, and we sit at the table on KPI definition, attribution, and budget allocation. Our clients get a real partner to CMOs, CFOs, and Founders — not a reporting dashboard.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="ag-06" data-kind="blurb" data-services="all" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            
+            <div class="chips"><span class="chip svc-all">All Services</span></div>
+          </div>
+          <div class="snippet-text named">Most agencies specialize in one channel. We don&#x27;t think a single-channel expert can credibly own a P&amp;L. Our average day runs through Meta optimizations, creative briefs, SEO technical work, GA4 and attribution, and creator pipelines. The integrated view is the product.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="ag-07" data-kind="blurb" data-services="consulting" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            
+            <div class="chips"><span class="chip svc-consulting">Consulting</span></div>
+          </div>
+          <div class="snippet-text named">Our edge is consulting DNA on top of career growth marketers. We treat marketing as a business problem, not a media problem. That&#x27;s why our clients include CFOs and founders on our weekly calls.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="cr-03" data-kind="blurb" data-services="creative" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            
+            <div class="chips"><span class="chip svc-creative">Creative</span></div>
+          </div>
+          <div class="snippet-text named">Creative ingenuity is the single biggest input to performance on Meta, TikTok, YouTube, and landing pages. We run a high-frequency, iterative, analytical creative process — typically 6 ads every two weeks, paired with a 45-minute biweekly performance recap that drives the next brief. We work alongside in-house design teams or supply our own.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="da-03" data-kind="blurb" data-services="data attribution" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            
+            <div class="chips"><span class="chip svc-data">Data</span><span class="chip svc-attribution">Attribution</span></div>
+          </div>
+          <div class="snippet-text named">Since iOS 14 and cookie deprecation, last-click is fiction. We build custom attribution models, leverage tools like Triple Whale, and use unique-identifier mapping for clients with offline sales or long cycles. The point isn&#x27;t to have a number — it&#x27;s to have a number you can act on.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        </div>
+      </section>
+    
+      <section class="icp-section" data-icp="icp1">
+        <h2 class="icp-h">ICP 1: VC-Backed Early Stage</h2>
+        <div class="snippet-grid">
+          
+        <div class="snippet" data-id="ag-03" data-kind="one-liner" data-services="paid" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            
+            <div class="chips"><span class="chip svc-paid">Paid Media</span></div>
+          </div>
+          <div class="snippet-text named">We&#x27;ve scaled brands from pre-launch to $30M+ in annual digital ad spend.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i1-01" data-kind="one-liner" data-services="paid" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            <span class="chip chip-client">Fora Travel</span>
+            <div class="chips"><span class="chip svc-paid">Paid Media</span></div>
+          </div>
+          <div class="snippet-text named">Fora Travel: media partners since pre-launch in 2021. Last year, we scaled media and acquisition 3x — they closed a $40M Series C.</div>
+          <div class="snippet-text anon" hidden>VC-backed travel platform: media partners since pre-launch. Scaled acquisition 3x in a year, fueling a $40M Series C.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i1-02" data-kind="one-liner" data-services="paid consulting" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            <span class="chip chip-client">BARK</span>
+            <div class="chips"><span class="chip svc-paid">Paid Media</span><span class="chip svc-consulting">Consulting</span></div>
+          </div>
+          <div class="snippet-text named">BARK (formerly BarkBox): we built the growth acquisition team and scaled the company 3x in revenue over 3 years before it went public.</div>
+          <div class="snippet-text anon" hidden>Built the growth acquisition team for a publicly traded subscription brand. 3x revenue over 3 years.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i1-03" data-kind="one-liner" data-services="paid consulting" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            
+            <div class="chips"><span class="chip svc-paid">Paid Media</span><span class="chip svc-consulting">Consulting</span></div>
+          </div>
+          <div class="snippet-text named">Five of our portfolio companies raised $80M+ in Series A — four of them raising over $10M each — after scaling with us.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i1-04" data-kind="blurb" data-services="paid" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            <span class="chip chip-client">Fora Travel</span>
+            <div class="chips"><span class="chip svc-paid">Paid Media</span></div>
+          </div>
+          <div class="snippet-text named">Fora Travel hired us pre-launch in 2021. We built paid from zero, scaled media and acquisition 3x in the most recent year, and helped them land a $40M Series C. We&#x27;re still their paid media partner — not the playbook of an agency that gets fired the day a client crosses 100K users.</div>
+          <div class="snippet-text anon" hidden>We took a VC-backed travel platform from pre-launch to a $40M Series C. We&#x27;re still running their paid media four years later — proof that we operate at the level founders need at every stage, not just early.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i1-05" data-kind="blurb" data-services="paid consulting" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            
+            <div class="chips"><span class="chip svc-paid">Paid Media</span><span class="chip svc-consulting">Consulting</span></div>
+          </div>
+          <div class="snippet-text named">VC-backed brands hire us when speed-to-scale matters more than vendor cycles. We&#x27;ve taken companies from pre-launch to $30M+ in annual ad spend, helped portfolio companies raise $200M+ post-engagement, and led growth at brands that went public. The common thread: we&#x27;re the team that can build paid, SEO, attribution, and creative simultaneously while the company is still hiring its first CMO.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="seo-05" data-kind="blurb" data-services="seo" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            
+            <div class="chips"><span class="chip svc-seo">SEO / AEO</span></div>
+          </div>
+          <div class="snippet-text named">Our SEO practice is enterprise-grade — technical site architecture, pillar content, and AEO/answer-engine optimization. Krista leads it, with deep enterprise SEO experience. That&#x27;s what makes us credible against boutique SEO shops, not just performance agencies playing in SEO.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        </div>
+      </section>
+    
+      <section class="icp-section" data-icp="icp2">
+        <h2 class="icp-h">ICP 2: Legacy &amp; Omnichannel</h2>
+        <div class="snippet-grid">
+          
+        <div class="snippet" data-id="cr-01" data-kind="one-liner" data-services="creative web" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            <span class="chip chip-client">Levain Bakery</span>
+            <div class="chips"><span class="chip svc-creative">Creative</span><span class="chip svc-web">Web / CRO</span></div>
+          </div>
+          <div class="snippet-text named">Levain Bakery: matched mobile-first landing pages to top creative personas. Result: +25% CVR, lower CAC, greater scale.</div>
+          <div class="snippet-text anon" hidden>F&amp;B brand: matched mobile-first landing pages to top creative personas. +25% CVR, lower CAC, greater scale.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="da-01" data-kind="one-liner" data-services="data attribution" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            <span class="chip chip-client">Blistex × StackAdapt</span>
+            <div class="chips"><span class="chip svc-data">Data</span><span class="chip svc-attribution">Attribution</span></div>
+          </div>
+          <div class="snippet-text named">Built a unified data warehouse for 7 brands pulling from 10+ ad platforms, 5+ retailers, and Nielsen and Circana scanner data. StackAdapt is now building MMM on top.</div>
+          <div class="snippet-text anon" hidden>Built a unified data warehouse for a 7-brand CPG portfolio pulling 10+ ad platforms, 5+ retailers, and syndicated scanner data. MMM layered on top for budget reallocation.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i2-01" data-kind="one-liner" data-services="paid retail seo" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            <span class="chip chip-client">Blistex</span>
+            <div class="chips"><span class="chip svc-paid">Paid Media</span><span class="chip svc-retail">Retail Media</span><span class="chip svc-seo">SEO / AEO</span></div>
+          </div>
+          <div class="snippet-text named">Blistex: we manage the entire 7-brand CPG portfolio across paid, retail media, and SEO. Net sales grew on 6 of 7 brands in year one, with Tucks up 10%+ and Amazon sales nearly doubled.</div>
+          <div class="snippet-text anon" hidden>Legacy CPG portfolio (7 brands): grew net sales on 6 of 7 in year one, +10% on the lead brand, Amazon sales nearly doubled.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i2-02" data-kind="one-liner" data-services="retail paid" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            <span class="chip chip-client">Ka&#x27;Chava</span>
+            <div class="chips"><span class="chip svc-retail">Retail Media</span><span class="chip svc-paid">Paid Media</span></div>
+          </div>
+          <div class="snippet-text named">Ka&#x27;Chava: built and scaled their Amazon business from $0 to $20M in sales in 12 months, while running their multi-million-dollar monthly DTC paid program.</div>
+          <div class="snippet-text anon" hidden>9-figure DTC nutrition brand: launched and scaled their Amazon business from $0 to $20M in sales in 12 months.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i2-03" data-kind="one-liner" data-services="retail" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            
+            <div class="chips"><span class="chip svc-retail">Retail Media</span></div>
+          </div>
+          <div class="snippet-text named">We profitably scaled Amazon stores to $20M+ in annual revenue.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i2-04" data-kind="one-liner" data-services="paid" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            
+            <div class="chips"><span class="chip svc-paid">Paid Media</span></div>
+          </div>
+          <div class="snippet-text named">Achieved record-breaking sales for a 9-figure DTC nutrition brand.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i2-05" data-kind="one-liner" data-services="paid affiliate creative" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            <span class="chip chip-client">Ergobaby</span>
+            <div class="chips"><span class="chip svc-paid">Paid Media</span><span class="chip svc-affiliate">Affiliate</span><span class="chip svc-creative">Creative</span></div>
+          </div>
+          <div class="snippet-text named">Ergobaby: we run growth strategy, paid, affiliate, and creative for three baby brands across three continents.</div>
+          <div class="snippet-text anon" hidden>PE-owned baby products brand: growth strategy, paid, affiliate, and creative for 3 brands across 3 continents.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i4-02" data-kind="one-liner" data-services="creative paid" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            <span class="chip chip-client">Ka&#x27;Chava</span>
+            <div class="chips"><span class="chip svc-creative">Creative</span><span class="chip svc-paid">Paid Media</span></div>
+          </div>
+          <div class="snippet-text named">Improved Ka&#x27;Chava&#x27;s Meta creative win rate from 15% to nearly 60% through a systematic testing program — and we&#x27;re now responsible for over half of their creator content.</div>
+          <div class="snippet-text anon" hidden>Scaled a 9-figure DTC brand&#x27;s Meta creative win rate from 15% to nearly 60% through systematic testing.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i4-03" data-kind="one-liner" data-services="creative" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            
+            <div class="chips"><span class="chip svc-creative">Creative</span></div>
+          </div>
+          <div class="snippet-text named">We&#x27;ve built and managed massive UGC creator pipelines for Ka&#x27;Chava, Rent the Runway, Blistex, and others.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="rm-01" data-kind="one-liner" data-services="retail" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            
+            <div class="chips"><span class="chip svc-retail">Retail Media</span></div>
+          </div>
+          <div class="snippet-text named">We manage retail media across Amazon and Walmart for a portfolio of 8 global consumer brands — strategy focused on new-to-brand acquisition.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="rm-02" data-kind="one-liner" data-services="retail" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            
+            <div class="chips"><span class="chip svc-retail">Retail Media</span></div>
+          </div>
+          <div class="snippet-text named">Retail media activation drove 2x+ ecom sales in 18 months for our CPG portfolio — fully incremental, with accelerating organic and return sales after activation.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="seo-02" data-kind="one-liner" data-services="seo" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            <span class="chip chip-client">National flooring brand</span>
+            <div class="chips"><span class="chip svc-seo">SEO / AEO</span></div>
+          </div>
+          <div class="snippet-text named">For a national flooring brand, technical SEO and AEO work delivered 7x ChatGPT traffic YoY, +25% organic, and lower paid CAC.</div>
+          <div class="snippet-text anon" hidden>For a national consumer brand, technical SEO and AEO work delivered 7x ChatGPT traffic YoY, +25% organic, and lower paid CAC.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="seo-03" data-kind="one-liner" data-services="seo" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            <span class="chip chip-client">Ivarest</span>
+            <div class="chips"><span class="chip svc-seo">SEO / AEO</span></div>
+          </div>
+          <div class="snippet-text named">Ivarest blog: built from scratch. Non-brand keywords +215% YoY, branded keywords +200% in rankings, total clicks +300%, visibility +780%.</div>
+          <div class="snippet-text anon" hidden>Built a brand blog from scratch for a CPG client. Non-brand keywords +215% YoY, branded keywords +200% in rankings, total clicks +300%, visibility +780%.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="cr-02" data-kind="blurb" data-services="creative web" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            <span class="chip chip-client">Levain Bakery</span>
+            <div class="chips"><span class="chip svc-creative">Creative</span><span class="chip svc-web">Web / CRO</span></div>
+          </div>
+          <div class="snippet-text named">Most brands run dozens of creative tests a month. Nearly all drive to the same landing page. That gap between ad and site is where conversions die. For Levain Bakery we identified top personas from customer data and built mobile-first landing pages matched to each creative. CVR up 25%, CAC down, scale up.</div>
+          <div class="snippet-text anon" hidden>Most brands run dozens of creative tests a month. Nearly all drive to the same landing page. That gap between ad and site is where conversions die. For one F&amp;B brand we built persona-matched mobile-first landing pages tied to top creatives — CVR up 25%, CAC down, scale up.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="da-02" data-kind="blurb" data-services="data attribution" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            <span class="chip chip-client">Blistex × StackAdapt</span>
+            <div class="chips"><span class="chip svc-data">Data</span><span class="chip svc-attribution">Attribution</span></div>
+          </div>
+          <div class="snippet-text named">Most omnichannel brands have reporting in 10+ platforms, none of which agree. We built a unified data warehouse for our 7-brand CPG portfolio pulling from every ad platform, every retailer, and Nielsen and Circana scanner data. StackAdapt is now layering MMM on top. The warehouse is the foundation. The MMM is the action layer. Together they replace guesswork with a reallocation loop that gets smarter every cycle.</div>
+          <div class="snippet-text anon" hidden>Most omnichannel brands have reporting in 10+ platforms, none of which agree. We built a unified data warehouse for a 7-brand CPG portfolio, pulling every ad platform, every retailer, and syndicated scanner data, with MMM layered on top. The warehouse is the foundation. The MMM is the action layer.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i2-06" data-kind="blurb" data-services="paid retail seo" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            <span class="chip chip-client">Blistex</span>
+            <div class="chips"><span class="chip svc-paid">Paid Media</span><span class="chip svc-retail">Retail Media</span><span class="chip svc-seo">SEO / AEO</span></div>
+          </div>
+          <div class="snippet-text named">We manage Blistex&#x27;s full 7-brand portfolio — paid media driving brick-and-mortar sell-through, plus Amazon, Walmart, and Target. In year one we grew net sales on 6 of 7 brands. Tucks alone grew 10%+ and picked up two points of market share. Amazon sales nearly doubled. Legacy CPG modernization is what we&#x27;re built for.</div>
+          <div class="snippet-text anon" hidden>We took a 7-brand legacy CPG portfolio and modernized the entire paid stack — brick-and-mortar lift, plus Amazon, Walmart, and Target. Year one: net sales grew on 6 of 7 brands, the lead brand picked up 2 points of market share, and Amazon nearly doubled.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i2-07" data-kind="blurb" data-services="paid retail" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            <span class="chip chip-client">Ka&#x27;Chava</span>
+            <div class="chips"><span class="chip svc-paid">Paid Media</span><span class="chip svc-retail">Retail Media</span></div>
+          </div>
+          <div class="snippet-text named">Ka&#x27;Chava came to us with a 9-figure DTC business and no Amazon presence. We launched their store and scaled it from zero to $20M in sales in a single year, while running the multi-million-dollar monthly Meta program. Most agencies pick a lane. The clients with brand equity and distribution need someone who can run both at once.</div>
+          <div class="snippet-text anon" hidden>A 9-figure DTC nutrition brand hired us to run paid social and to launch Amazon. We scaled the Amazon store from $0 to $20M in 12 months while managing the multi-million monthly DTC paid program in parallel.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i2-08" data-kind="blurb" data-services="paid retail seo creative" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            
+            <div class="chips"><span class="chip svc-paid">Paid Media</span><span class="chip svc-retail">Retail Media</span><span class="chip svc-seo">SEO / AEO</span><span class="chip svc-creative">Creative</span></div>
+          </div>
+          <div class="snippet-text named">Legacy and PE-backed brands hire us when they have brand equity and distribution but no in-house digital muscle. We build the channel from scratch or professionalize a scrappy in-house effort. We don&#x27;t break the brand to do it. The work spans paid, Amazon and Walmart Connect, SEO/AEO, and creative — and we coordinate across all of it.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i4-05" data-kind="blurb" data-services="creative paid" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            <span class="chip chip-client">Ka&#x27;Chava</span>
+            <div class="chips"><span class="chip svc-creative">Creative</span><span class="chip svc-paid">Paid Media</span></div>
+          </div>
+          <div class="snippet-text named">Creative is the single biggest lever in DTC paid. Most agencies talk about it; we run a sprint cycle around it. For Ka&#x27;Chava we lifted creative win rate from 15% to nearly 60% through a structured test-and-iterate program, and built a creator pipeline that now drives more than half of total content.</div>
+          <div class="snippet-text anon" hidden>Creative is the single biggest lever in DTC paid. We run a structured sprint cycle: for one 9-figure DTC brand we lifted creative win rate from 15% to nearly 60% and built a creator pipeline that now drives more than half their total content.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="rm-03" data-kind="blurb" data-services="retail" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            <span class="chip chip-client">Blistex Family</span>
+            <div class="chips"><span class="chip svc-retail">Retail Media</span></div>
+          </div>
+          <div class="snippet-text named">We run retail media for a portfolio of 8 global consumer brands — Blistex, Odor-Eaters, Tucks, Ivarest, and four others — across Amazon and Walmart, with strategy focused on new-to-brand acquisition. Every brand showed accelerating organic and return sales after media activation, confirming full incrementality. Ecom sales 2x+ in 18 months.</div>
+          <div class="snippet-text anon" hidden>We run retail media for a portfolio of 8 global CPG brands across Amazon and Walmart, with strategy focused on new-to-brand acquisition. Every brand showed accelerating organic and return sales after activation — fully incremental. Ecom sales 2x+ in 18 months.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="seo-04" data-kind="blurb" data-services="seo" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            
+            <div class="chips"><span class="chip svc-seo">SEO / AEO</span></div>
+          </div>
+          <div class="snippet-text named">Paid search CPCs climb every year. The brands pulling ahead are building organic visibility across Google, YouTube, Reddit, and the AI answer engines now taking search share. We do all of it: technical SEO, content, AEO. For one national consumer brand we drove 7x ChatGPT traffic YoY, +25% organic, and lower paid CAC at the same time.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="seo-05" data-kind="blurb" data-services="seo" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            
+            <div class="chips"><span class="chip svc-seo">SEO / AEO</span></div>
+          </div>
+          <div class="snippet-text named">Our SEO practice is enterprise-grade — technical site architecture, pillar content, and AEO/answer-engine optimization. Krista leads it, with deep enterprise SEO experience. That&#x27;s what makes us credible against boutique SEO shops, not just performance agencies playing in SEO.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        </div>
+      </section>
+    
+      <section class="icp-section" data-icp="icp3">
+        <h2 class="icp-h">ICP 3: Travel, Events &amp; Hospitality</h2>
+        <div class="snippet-grid">
+          
+        <div class="snippet" data-id="i1-01" data-kind="one-liner" data-services="paid" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            <span class="chip chip-client">Fora Travel</span>
+            <div class="chips"><span class="chip svc-paid">Paid Media</span></div>
+          </div>
+          <div class="snippet-text named">Fora Travel: media partners since pre-launch in 2021. Last year, we scaled media and acquisition 3x — they closed a $40M Series C.</div>
+          <div class="snippet-text anon" hidden>VC-backed travel platform: media partners since pre-launch. Scaled acquisition 3x in a year, fueling a $40M Series C.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i3-01" data-kind="one-liner" data-services="paid" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            <span class="chip chip-client">Postcard Cabins</span>
+            <div class="chips"><span class="chip svc-paid">Paid Media</span></div>
+          </div>
+          <div class="snippet-text named">Postcard Cabins (fka Getaway): we led growth strategy and paid media for 3+ years, scaling spend and bookings 2.5x with CPA flat. Sold to Marriott in a ~$100M deal.</div>
+          <div class="snippet-text anon" hidden>Cabin rental hospitality brand: scaled spend and bookings 2.5x over 3 years while holding CPA flat. Acquired by a major hotel group in a ~$100M deal.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i3-02" data-kind="one-liner" data-services="paid seo web" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            <span class="chip chip-client">Cipriani</span>
+            <div class="chips"><span class="chip svc-paid">Paid Media</span><span class="chip svc-seo">SEO / AEO</span><span class="chip svc-web">Web / CRO</span></div>
+          </div>
+          <div class="snippet-text named">Cipriani: paid acquisition, SEO, and website development for the global restaurant and hospitality group and its restaurant brands.</div>
+          <div class="snippet-text anon" hidden>Global luxury hospitality and restaurant group: paid, SEO, and web across multiple owned brands.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="seo-01" data-kind="one-liner" data-services="seo" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            
+            <div class="chips"><span class="chip svc-seo">SEO / AEO</span></div>
+          </div>
+          <div class="snippet-text named">Built an SEO program from scratch and grew it to 1M+ monthly organic visits, ranking for hundreds of luxury travel terms.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i3-03" data-kind="blurb" data-services="paid" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            <span class="chip chip-client">Postcard Cabins</span>
+            <div class="chips"><span class="chip svc-paid">Paid Media</span></div>
+          </div>
+          <div class="snippet-text named">We led growth and paid media at Postcard Cabins (formerly Getaway) for 3+ years. Spend and bookings scaled 2.5x while CPA stayed flat — the kind of efficiency curve that makes a company acquirable. They sold to Marriott in a ~$100M deal in 2024.</div>
+          <div class="snippet-text anon" hidden>We ran growth and paid media for a cabin rental hospitality brand for 3+ years, scaling spend and bookings 2.5x while holding CPA flat. They were acquired by a major hotel group in a ~$100M deal.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i3-04" data-kind="blurb" data-services="paid seo web" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            <span class="chip chip-client">Cipriani</span>
+            <div class="chips"><span class="chip svc-paid">Paid Media</span><span class="chip svc-seo">SEO / AEO</span><span class="chip svc-web">Web / CRO</span></div>
+          </div>
+          <div class="snippet-text named">Hospitality is one of the highest search-intent categories online. We run paid, SEO, and website work for Cipriani — the restaurant group, the events business, and the members&#x27; club. Local SEO, discovery search, and AI recommendation engines are where bookings now compound.</div>
+          <div class="snippet-text anon" hidden>We run paid, SEO, and website work for a global hospitality group spanning restaurants, events, and members clubs. Local SEO, discovery search, and AI recommendation engines are where bookings now compound.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="seo-05" data-kind="blurb" data-services="seo" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            
+            <div class="chips"><span class="chip svc-seo">SEO / AEO</span></div>
+          </div>
+          <div class="snippet-text named">Our SEO practice is enterprise-grade — technical site architecture, pillar content, and AEO/answer-engine optimization. Krista leads it, with deep enterprise SEO experience. That&#x27;s what makes us credible against boutique SEO shops, not just performance agencies playing in SEO.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        </div>
+      </section>
+    
+      <section class="icp-section" data-icp="icp4">
+        <h2 class="icp-h">ICP 4: D2C Growth Brand</h2>
+        <div class="snippet-grid">
+          
+        <div class="snippet" data-id="ag-03" data-kind="one-liner" data-services="paid" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            
+            <div class="chips"><span class="chip svc-paid">Paid Media</span></div>
+          </div>
+          <div class="snippet-text named">We&#x27;ve scaled brands from pre-launch to $30M+ in annual digital ad spend.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i1-02" data-kind="one-liner" data-services="paid consulting" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            <span class="chip chip-client">BARK</span>
+            <div class="chips"><span class="chip svc-paid">Paid Media</span><span class="chip svc-consulting">Consulting</span></div>
+          </div>
+          <div class="snippet-text named">BARK (formerly BarkBox): we built the growth acquisition team and scaled the company 3x in revenue over 3 years before it went public.</div>
+          <div class="snippet-text anon" hidden>Built the growth acquisition team for a publicly traded subscription brand. 3x revenue over 3 years.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i2-02" data-kind="one-liner" data-services="retail paid" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            <span class="chip chip-client">Ka&#x27;Chava</span>
+            <div class="chips"><span class="chip svc-retail">Retail Media</span><span class="chip svc-paid">Paid Media</span></div>
+          </div>
+          <div class="snippet-text named">Ka&#x27;Chava: built and scaled their Amazon business from $0 to $20M in sales in 12 months, while running their multi-million-dollar monthly DTC paid program.</div>
+          <div class="snippet-text anon" hidden>9-figure DTC nutrition brand: launched and scaled their Amazon business from $0 to $20M in sales in 12 months.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i2-04" data-kind="one-liner" data-services="paid" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            
+            <div class="chips"><span class="chip svc-paid">Paid Media</span></div>
+          </div>
+          <div class="snippet-text named">Achieved record-breaking sales for a 9-figure DTC nutrition brand.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i4-01" data-kind="one-liner" data-services="paid creative" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            <span class="chip chip-client">Rent the Runway</span>
+            <div class="chips"><span class="chip svc-paid">Paid Media</span><span class="chip svc-creative">Creative</span></div>
+          </div>
+          <div class="snippet-text named">Rent the Runway: we built their paid social and paid search approach and now own half of their creative output. Paid channels have hit new customer goals six straight months.</div>
+          <div class="snippet-text anon" hidden>Publicly traded fashion subscription brand: built paid social and search from scratch, now agency of record. Hit new-customer goals six straight months.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i4-02" data-kind="one-liner" data-services="creative paid" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            <span class="chip chip-client">Ka&#x27;Chava</span>
+            <div class="chips"><span class="chip svc-creative">Creative</span><span class="chip svc-paid">Paid Media</span></div>
+          </div>
+          <div class="snippet-text named">Improved Ka&#x27;Chava&#x27;s Meta creative win rate from 15% to nearly 60% through a systematic testing program — and we&#x27;re now responsible for over half of their creator content.</div>
+          <div class="snippet-text anon" hidden>Scaled a 9-figure DTC brand&#x27;s Meta creative win rate from 15% to nearly 60% through systematic testing.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i4-03" data-kind="one-liner" data-services="creative" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-one-liner">one-liner</span>
+            
+            <div class="chips"><span class="chip svc-creative">Creative</span></div>
+          </div>
+          <div class="snippet-text named">We&#x27;ve built and managed massive UGC creator pipelines for Ka&#x27;Chava, Rent the Runway, Blistex, and others.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="cr-02" data-kind="blurb" data-services="creative web" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            <span class="chip chip-client">Levain Bakery</span>
+            <div class="chips"><span class="chip svc-creative">Creative</span><span class="chip svc-web">Web / CRO</span></div>
+          </div>
+          <div class="snippet-text named">Most brands run dozens of creative tests a month. Nearly all drive to the same landing page. That gap between ad and site is where conversions die. For Levain Bakery we identified top personas from customer data and built mobile-first landing pages matched to each creative. CVR up 25%, CAC down, scale up.</div>
+          <div class="snippet-text anon" hidden>Most brands run dozens of creative tests a month. Nearly all drive to the same landing page. That gap between ad and site is where conversions die. For one F&amp;B brand we built persona-matched mobile-first landing pages tied to top creatives — CVR up 25%, CAC down, scale up.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i2-07" data-kind="blurb" data-services="paid retail" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            <span class="chip chip-client">Ka&#x27;Chava</span>
+            <div class="chips"><span class="chip svc-paid">Paid Media</span><span class="chip svc-retail">Retail Media</span></div>
+          </div>
+          <div class="snippet-text named">Ka&#x27;Chava came to us with a 9-figure DTC business and no Amazon presence. We launched their store and scaled it from zero to $20M in sales in a single year, while running the multi-million-dollar monthly Meta program. Most agencies pick a lane. The clients with brand equity and distribution need someone who can run both at once.</div>
+          <div class="snippet-text anon" hidden>A 9-figure DTC nutrition brand hired us to run paid social and to launch Amazon. We scaled the Amazon store from $0 to $20M in 12 months while managing the multi-million monthly DTC paid program in parallel.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i4-04" data-kind="blurb" data-services="paid creative" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            <span class="chip chip-client">Rent the Runway</span>
+            <div class="chips"><span class="chip svc-paid">Paid Media</span><span class="chip svc-creative">Creative</span></div>
+          </div>
+          <div class="snippet-text named">We rebuilt RTR&#x27;s paid social and paid search from the ground up. We&#x27;re now agency of record and produce roughly half of their creative output. They&#x27;ve hit new-customer goals six months in a row. Subscription D2C is unforgiving on CAC math; we built the testing apparatus to keep efficiency moving in the right direction.</div>
+          <div class="snippet-text anon" hidden>We rebuilt paid social and paid search for a publicly traded fashion subscription brand and now produce roughly half their creative output. New-customer goals hit six months in a row.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="i4-05" data-kind="blurb" data-services="creative paid" data-anon="true">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            <span class="chip chip-client">Ka&#x27;Chava</span>
+            <div class="chips"><span class="chip svc-creative">Creative</span><span class="chip svc-paid">Paid Media</span></div>
+          </div>
+          <div class="snippet-text named">Creative is the single biggest lever in DTC paid. Most agencies talk about it; we run a sprint cycle around it. For Ka&#x27;Chava we lifted creative win rate from 15% to nearly 60% through a structured test-and-iterate program, and built a creator pipeline that now drives more than half of total content.</div>
+          <div class="snippet-text anon" hidden>Creative is the single biggest lever in DTC paid. We run a structured sprint cycle: for one 9-figure DTC brand we lifted creative win rate from 15% to nearly 60% and built a creator pipeline that now drives more than half their total content.</div>
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            <button class="anon-btn" type="button">Anonymized</button>
+          </div>
+        </div>
+    
+        <div class="snippet" data-id="seo-04" data-kind="blurb" data-services="seo" data-anon="false">
+          <div class="snippet-meta">
+            <span class="kind-pill kind-blurb">short blurb</span>
+            
+            <div class="chips"><span class="chip svc-seo">SEO / AEO</span></div>
+          </div>
+          <div class="snippet-text named">Paid search CPCs climb every year. The brands pulling ahead are building organic visibility across Google, YouTube, Reddit, and the AI answer engines now taking search share. We do all of it: technical SEO, content, AEO. For one national consumer brand we drove 7x ChatGPT traffic YoY, +25% organic, and lower paid CAC at the same time.</div>
+          
+          <div class="snippet-actions">
+            <button class="copy-btn" type="button">Copy</button>
+            
+          </div>
+        </div>
+    
+        </div>
+      </section>
+    
+  <div class="empty-state" id="empty" hidden>No snippets match these filters.</div>
+</main>
+
+<footer>Deodato Proof Points Menu — last updated 2026-04-27</footer>
+
+<script>
+  const state = { icp: "all-show-all", service: null, kind: "all", search: "", anon: false };
+
+  // ICP tabs
+  document.querySelectorAll('.icp-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const icp = btn.dataset.icp;
+      // toggle: if same one already active, deactivate (show all)
+      const wasActive = btn.classList.contains('active');
+      document.querySelectorAll('.icp-tab').forEach(b => b.classList.remove('active'));
+      if (!wasActive) { btn.classList.add('active'); state.icp = icp; }
+      else { state.icp = "all-show-all"; }
+      apply();
+    });
+  });
+
+  // Service filter
+  document.querySelectorAll('.filter-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const svc = btn.dataset.svc;
+      const wasActive = btn.classList.contains('active');
+      document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+      if (!wasActive) { btn.classList.add('active'); state.service = svc; }
+      else { state.service = null; }
+      apply();
+    });
+  });
+
+  // Length toggle
+  document.querySelectorAll('.kind-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.kind-toggle').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.kind = btn.dataset.kind;
+      apply();
+    });
+  });
+
+  // Search
+  document.getElementById('search').addEventListener('input', e => {
+    state.search = e.target.value.toLowerCase().trim();
+    apply();
+  });
+
+  function apply() {
+    let visibleCount = 0;
+    document.querySelectorAll('.icp-section').forEach(sec => {
+      const icpMatch = (state.icp === "all-show-all") || (sec.dataset.icp === state.icp);
+      let sectionVisible = 0;
+      sec.querySelectorAll('.snippet').forEach(card => {
+        const services = (card.dataset.services || "").split(' ');
+        const svcMatch = !state.service || services.includes(state.service) || services.includes('all');
+        const kindMatch = state.kind === "all" || card.dataset.kind === state.kind;
+        const text = card.innerText.toLowerCase();
+        const searchMatch = !state.search || text.includes(state.search);
+        const show = icpMatch && svcMatch && kindMatch && searchMatch;
+        card.hidden = !show;
+        if (show) { sectionVisible++; visibleCount++; }
+      });
+      sec.hidden = sectionVisible === 0;
+    });
+    document.getElementById('empty').hidden = visibleCount > 0;
+  }
+
+  // Per-card anonymized toggle
+  document.querySelectorAll('.anon-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const card = btn.closest('.snippet');
+      const named = card.querySelector('.snippet-text.named');
+      const anon  = card.querySelector('.snippet-text.anon');
+      const showingAnon = btn.classList.toggle('active');
+      if (showingAnon) { named.hidden = true; anon.hidden = false; btn.textContent = 'Named'; }
+      else            { named.hidden = false; anon.hidden = true; btn.textContent = 'Anonymized'; }
+    });
+  });
+
+  // Copy button
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const card = btn.closest('.snippet');
+      const visibleText = card.querySelector('.snippet-text:not([hidden])').innerText;
+      try {
+        await navigator.clipboard.writeText(visibleText);
+        btn.classList.add('copied');
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.classList.remove('copied'); btn.textContent = orig; }, 1400);
+      } catch (e) {
+        // Fallback: select text
+        const range = document.createRange();
+        range.selectNodeContents(card.querySelector('.snippet-text:not([hidden])'));
+        const sel = window.getSelection();
+        sel.removeAllRanges(); sel.addRange(range);
+      }
+    });
+  });
+</script>
+</body>
+</html>
